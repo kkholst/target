@@ -56,7 +56,7 @@ partial.policy_data <- function(object, K){
   return(object)
 }
 # # checks
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # tmp <- partial(policy_data, K = 3)
 # tmp2 <- tmp$stage_data
 
@@ -117,7 +117,7 @@ full_stage_history <- function(object, stage){
   return(history)
 }
 # checks:
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # tmp <- full_stage_history(policy_data, 2)
 # tmp2 <- tmp$dt
 # tmp$action_name
@@ -167,7 +167,7 @@ markov_stage_history <- function(object, stage){
   return(history)
 }
 # checks
-data("policy_data")
+if (!exists("policy_data")) data("policy_data")
 tmp <- markov_stage_history(policy_data, stage = 2)
 tmp2 <- tmp$dt
 tmp$action_name
@@ -216,7 +216,7 @@ markov_history.policy_data <- function(object){
   return(history)
 }
 # # checks
-data("policy_data")
+if (!exists("policy_data")) data("policy_data")
 tmp <- markov_history(policy_data)
 tmp2 <- tmp$dt
 tmp$history_names
@@ -245,7 +245,7 @@ get_X.history <- function(object){
   return(X)
 }
 # checks
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # # tmp <- markov_history(policy_data)
 # tmp <- markov_stage_history(policy_data, stage = 1)
 # tmp <- full_stage_history(policy_data, stage = 2)
@@ -264,7 +264,7 @@ get_A.history <- function(object){
   return(A)
 }
 # checks
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # #tmp <- markov_history(policy_data)
 # tmp <- full_stage_history(policy_data, stage = 2)
 # get_A(tmp)
@@ -280,7 +280,7 @@ get_id <- function(object){
   
   return(id)
 }
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # tmp <- full_stage_history(policy_data, stage = 2)
 # get_id(tmp)
 
@@ -301,7 +301,7 @@ utility.policy_data <- function(object){
   return(u)
 }
 # checks:
-# data("policy_data")
+# if (!exists("policy_data")) data("policy_data")
 # tmp <- utility(policy_data)
 # tmp <- policy_data$stage_data
 # tmp2 <- markov_stage_history(policy_data, stage = 3)

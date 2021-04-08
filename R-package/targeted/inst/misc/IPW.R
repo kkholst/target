@@ -231,17 +231,21 @@ mean(ipw_0$ed$ipw) # should be close to 1
 rm(pd)
 
 # always treat policy:
-set.seed(1)
+set.seed(2)
 m <- 1e3
+
+pb <- progress::progress_bar$new(
+                               format = " simulating [:bar] :percent eta: :eta",
+                               total = m, clear = FALSE, width= 60)
 ipw_1_est <- vector(mode = "numeric", length = m)
 for (i in seq_along(ipw_1_est)){
+  pb$tick()
   pd <- simulate_policy_data(2e3, args0)
   pd <- new_policy_data(stage_data = pd$stage_data, baseline_data = pd$baseline_data)
 
   ipw <- IPW(pd, g_model_list = binom_model, policy = policy_1)
   est <- ipw$ed[,.(mean(U * ipw))][[1]]
   rm(ipw)
-
   ipw_1_est[i] <- est
 }
 mean(ipw_1_est)
