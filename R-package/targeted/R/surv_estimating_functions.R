@@ -126,8 +126,8 @@ survival_treatment_level_estimating_functions <- function(type = "risk",
 }
 
 ##' For a user defined function \eqn{H(u|X)}, computes the integral
-##' \eqn{\int_0^\tau \frac{H(u)|X}{S^c}} dM^c(u|X), where $S^c$ is the
-##' censoring time survival function and $M^c$ is the censoring
+##' \eqn{\int_0^\tau \frac{H(u)|X}{S^c}} dM^c(u|X), where \eqn{S^c} is the
+##' censoring time survival function and \eqn{M^c} is the censoring
 ##' is the right censoring martingale with the Doob-Meyer decomposition
 ##' \eqn{M^c = N^c - L^c}, where \eqn{N^c} is the counting process
 ##' \eqn{N^c(s) = I\{\tilde T \leq s \Delta = 0\}} and \eqn{L^c} is the

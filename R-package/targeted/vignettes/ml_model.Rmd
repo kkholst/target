@@ -1,0 +1,18 @@
+
+
+
+fit <- function(x, y, offset = NULL, ... ) {
+  if (is.null(offset)) offset <- 0
+  return(x + offset)
+}
+pred <- function(object, newdata, offset, ...) {
+  return(newdata[, "EXPOSURE"] + offset)
+}
+
+m <- ml_model$new(ptp ~ offset(abr_runin) + EXPOSURE,
+                  estimate = fit,
+                  specials = c("offset"),
+                  predict = pred
+             )
+m$estimate(d2)
+m$predict(head(d2))
