@@ -9,7 +9,8 @@
 ##' @param rep Number of repetitions (default 1)
 ##' @param weights Optional frequency weights
 ##' @param model.score Model scoring metric (default: MSE / Brier score). Must
-##'   be a function with arguments: response, prediction, weights, object, ...
+##'   be a function with arguments response and prediction, and may optionally
+##' include weights, object and newdata arguments
 ##' @param seed Random seed (argument parsed to future_Apply::future_lapply)
 ##' @param shared Function applied to each fold with results send to each model
 ##' @param args.pred Optional arguments to prediction function (see details
@@ -40,7 +41,7 @@
 cv <- function(models, data, response = NULL,
                nfolds = 5, rep = 1,
                weights = NULL,
-               model.score = NULL,
+               model.score = scoring,
                seed = NULL, shared = NULL, args.pred = NULL,
                args.future = list(), mc.cores, ...) {
 
@@ -56,12 +57,10 @@ cv <- function(models, data, response = NULL,
   if ("modelscore" %in% names(args0)) {
     .Deprecated("argument `modelscore` replaced by `model.score`")
     model.score <- args0$modelscore
-    args0$modelscore <- NULL
+    args0$modelscore <- model.score
   }
-  if (is.null(model.score)) model.score <- scoring
-  if (!("weights" %in% formalArgs(model.score))) {
-    formals(model.score) <- c(formals(model.score), alist(weights=NULL))
-  }
+  model.score <- add_dots(model.score)
+
   args <- args0
   data.arg <- NULL
   response.arg <- "response"
