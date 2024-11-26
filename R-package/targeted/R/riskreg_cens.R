@@ -29,7 +29,7 @@
 ##'   calculating this integral in all observed time points, we can make a
 ##'   coarser evaluation which can be controlled by setting
 ##'   \code{control=(sample=N)}. With \code{N=0} the (computational intensive)
-##'   standard evaluation is used.##'
+##'   standard evaluation is used.
 ##' @author Klaus K. Holst, Andreas Nordland
 ##' @export
 riskreg_cens <- function(response,
