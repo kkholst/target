@@ -1,6 +1,6 @@
 ---
 title: "Prediction model class (`ml_model`)
-author: Klaus Kähler Holst, Benedikt Sommer
+author: "Klaus Kähler Holst, Benedikt Sommer"
 date: "`r Sys.Date()`"
 output:
   knitr:::html_vignette:
@@ -27,3 +27,19 @@ library(targeted)
 
 # Introduction
 
+# Defining new learners with `predictor`
+
+predictor()
+
+
+## Methods
+estimate
+predict
+
+# Built-in model wrappers
+
+# Cross-validation
+
+# Calibration
+
+# Super Learners
