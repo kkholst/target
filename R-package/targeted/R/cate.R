@@ -12,8 +12,8 @@ ate_if_fold <- function(fold, data,
   pmod <- propensity_model$estimate(dtrain)
   X <- deval
   if (stratify) {
-    idx <- which(dtrain[, treatment]==level)
-    tmp <- response_model$estimate(dtrain[idx, , drop=FALSE])
+    idx <- which(dtrain[, treatment] == level)
+    tmp <- response_model$estimate(dtrain[idx, , drop = FALSE])
   } else {
     tmp <- response_model$estimate(dtrain)
     X[, treatment] <- level
@@ -120,7 +120,7 @@ cate <- function(response_model,
                  ## or average parameter estimates:
                  silent = FALSE,
                  stratify = FALSE,
-                 mc.cores,
+                 mc.cores = NULL,
                  ...) {
 
   cl <- match.call()
@@ -152,8 +152,9 @@ cate <- function(response_model,
   if (length(contrast) > 2) {
     stop("Expected contrast vector of length 1 or 2.")
   }
-  propensity_outcome <- function(treatment_level)
+  propensity_outcome <- function(treatment_level) {
     paste0("I(", treatment_var, "==", treatment_level, ")")
+  }
   if (missing(propensity_model)) {
     response_var <- lava::getoutcome(response_model$formula, data=data)
     newf <- reformulate(
@@ -174,13 +175,11 @@ cate <- function(response_model,
                        treatment_var,
                        stratify,
                        folds,
-                       pb,
                        ...) {
     rmod <- response_model$clone(deep = TRUE)
     pmod <- propensity_model$clone(deep = TRUE)
     newf <- reformulate(as.character(pmod$formula)[[3]], propensity_outcome(a))
     pmod$update(newf)
-    if (!silent) pb()
     val <- list(ate_if_fold(folds[[fold]], data,
       propensity_model = pmod,
       response_model = rmod,
@@ -192,47 +191,48 @@ cate <- function(response_model,
 
 
   calculate_scores <- function(args) {
-    if (!silent & (rep == 1)) {
-      pb <- progressr::progressor(steps = length(contrast) * nfolds)
-    } else {
-      pb <- function(...) NULL
-    }
     ## Create random folds
     if (nfolds<1) nfolds <- 1
     folds <- split(sample(1:n, n), rep(1:nfolds, length.out = n))
     folds <- lapply(folds, sort)
     ff <- Reduce(c, folds)
     idx <- order(ff)
+    fargs <- rbind(expand.grid(fold = seq_len(nfolds), a = contrast))
 
-    fargs <- rbind(expand.grid(seq_len(nfolds), contrast))
-    if (mc) {
-      val <- parallel::mcmapply(procfold,
-        a = as.list(fargs[, 2]), fold = as.list(fargs[, 1]),
-        mc.cores = 1,
-        MoreArgs = list(
-          propensity_model = propensity_model,
-          response_model = response_model,
-          treatment_var = treatment_var,
-          data = data, folds = folds,
-          stratify = stratify,
-          pb=pb
-        ),
-        ...
-      )
+    if (!silent && (rep == 1) && (nfolds>1)) {
+      pb <- progressr::progressor(message="cross-fitting",
+                                    steps = nrow(fargs))
     } else {
-      val <- future.apply::future_mapply(procfold,
-        a = as.list(fargs[, 2]), fold = as.list(fargs[, 1]),
-        future.seed = TRUE,
-        ## future.packages = c("lava", "targeted", "R6"),
-        MoreArgs = list(
-          propensity_model = propensity_model,
-          response_model = response_model,
-          treatment_var = treatment_var,
-          data = data, folds = folds,
-          stratify = stratify,
-          pb=pb
-        ),
-        ...
+      pb <- function(...) invisible(NULL)
+    }
+
+    myargs <- list(procfold,
+      a = as.list(fargs[, "a"]),
+      fold = as.list(fargs[, "fold"]),
+      MoreArgs = list(
+        propensity_model = propensity_model,
+        response_model = response_model,
+        treatment_var = treatment_var,
+        data = data, folds = folds,
+        stratify = stratify
+      ),
+      ...
+    )
+    if (!is.null(mc.cores)) {
+      myargs$mc.cores <- ifelse(rep == 1, mc.cores, 1)
+      val <- do.call(parallel::mcmapply, myargs)
+    } else {
+      myargs[[1]] <- function(a, fold, ...) {
+        res <- procfold(a = a, fold = fold, ...)
+        pb()
+        return(res)
+      }
+      if (!"future.seed" %in% names(myargs)) {
+        myargs["future.seed"] <- list(NULL)
+      }
+      val <- do.call(
+        future.apply::future_mapply,
+        myargs
       )
     }
 
@@ -265,22 +265,23 @@ cate <- function(response_model,
     list(scores = scores, adj = adj, qval = qval, pval = pval)
   }
 
-  mc <- !missing(mc.cores)
   if (rep > 1) {
-    pb <- progressr::progressor(steps = rep)
+    pb <- progressr::progressor(steps = rep, message="repetition")
     f <- function(...) {
+      res <- calculate_scores()
       pb()
-      return(calculate_scores())
+      return(res)
     }
-    if (mc) {
+    if (!is.null(mc.cores)) {
       val <- parallel::mclapply(1:rep, f,
-        mc.cores = mc.cores, pb = pb, ...
+        mc.cores = mc.cores, ...
       )
     } else {
-      val <- future.apply::future_lapply(
-        1:rep, f,
-        pb = pb, future.seed = TRUE, ...
-      )
+      myargs <- list(X=1:rep, FUN=f, ...)
+      if (!"future.seed" %in% names(myargs)) {
+        myargs["future.seed"] <- list(NULL)
+      }
+      val <- do.call(future.apply::future_lapply, myargs)
     }
   } else {
     val <- list(calculate_scores())
