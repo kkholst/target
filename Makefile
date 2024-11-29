@@ -94,6 +94,9 @@ r_build: r_clean
 r_test: r_build
 	@echo 'tinytest::test_package("targeted")' | $(R)
 
+r_test_loadall:
+	@echo 'devtools::load_all("R-package/${pkg}"); tinytest::test_all("R-package/${pkg}/")' | $(R)
+
 r_lint:
 	@echo 'devtools::lint("./R-package/$(pkg)")' | $(R)
 
