@@ -41,6 +41,7 @@ Imports:
     rlang,
     survival
 Suggests:
+    cmprsk,
     e1071,
     grf,
     hal9001,

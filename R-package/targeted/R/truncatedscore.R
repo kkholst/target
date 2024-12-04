@@ -128,14 +128,18 @@ truncatedscore_estimate <- function(
       labels = lab0,
       id = rownames(data)
     )
-    cc <- cmprsk::cuminc(data$time, data$status, data$a)
-    F1.a0 <- cmprsk::timepoints(cc["0 1"], 2)
-    F1.a1 <- cmprsk::timepoints(cc["1 1"], 2)
-    lab <- paste0("cmprsk.", lab)
-    ee <- estimate(
-      coef = c(F1.a0$est, F1.a1$est),
-      vcov = diag(c(F1.a0$var, F1.a1$var))
-    ) |> estimate(cbind(c(1, 0, -1), c(0, 1, 1)), labels = lab)
+    if (requireNamespace("cmprsk", quietly = TRUE)) {
+      cc <- cmprsk::cuminc(data$time, data$status, data$a)
+      F1.a0 <- cmprsk::timepoints(cc["0 1"], 2)
+      F1.a1 <- cmprsk::timepoints(cc["1 1"], 2)
+      laab <- paste0("cmprsk.", lab)
+      ee <- estimate(
+        coef = c(F1.a0$est, F1.a1$est),
+        vcov = diag(c(F1.a0$var, F1.a1$var))
+      ) |> estimate(cbind(c(1, 0, -1), c(0, 1, 1)), labels = lab)
+    } else {
+      ee <- NULL
+    }
     res0 <- res0 + best0
     res <- structure(res, naive = list(res0, cmprisk = ee))
   }
