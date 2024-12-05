@@ -37,6 +37,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          working-directory: R-packages/targeted
           extra-packages: any::drat
 
       - name: build
