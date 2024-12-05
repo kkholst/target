@@ -1,0 +1,47 @@
+name: publish R package
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/truncatedscore
+
+jobs:
+  r_targeted:
+    if: github.event.pull_request.draft == false
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: ubuntu-latest,   r: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - name: Checkout repository incl. submodules
+        uses: actions/checkout@v4
+        # with:
+        #   submodules: recursive
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+      - uses: r-lib/actions/setup-tinytex@v2
+      - run: tlmgr --version
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y pandoc libcurl4-openssl-dev libharfbuzz-dev libfribidi-dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::drat
+
+      - name: build
+        run: |
+          @cd build/R; $(R) CMD build $(pkg)
+          @cd ../..; git checkout gh-pages
+          @echo 'drat::insertPackage(action="archive", repodir="www/pkg", file=paste0("build/R/", list.files("build/R/", "gz$"))) | R --no-save --no-restore --silent
+          @git commit -a -m "workflow gh-pages"; git push
