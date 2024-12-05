@@ -37,12 +37,17 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          cache: always
           working-directory: R-package/targeted
           extra-packages: any::drat
 
       - name: build
         run: |
-          @cd build/R; $(R) CMD build $(pkg)
-          @cd ../..; git checkout gh-pages
-          @echo 'drat::insertPackage(action="archive", repodir="www/pkg", file=paste0("build/R/", list.files("build/R/", "gz$"))) | R --no-save --no-restore --silent
-          @git commit -a -m "workflow gh-pages"; git push
+          cd build/R; R CMD build targeted
+          cd ../..; git checkout gh-pages
+          echo 'drat::insertPackage(action="archive", repodir="www/pkg", file=paste0("build/R/", list.files("build/R/", "gz$")))' | R --no-save --no-restore --silent
+
+      - name: deploy
+        run: |
+          git commit -a -m "workflow gh-pages"
+          git push

@@ -31,7 +31,7 @@ Depends:
 Imports:
     data.table,
     future.apply,
-    glmnet,
+    nnls,
     optimx,
 	progressr,
     methods,
@@ -43,10 +43,10 @@ Imports:
 Suggests:
     cmprsk,
     e1071,
+    glmnet,
     grf,
     hal9001,
     mgcv,
-    nnls,
     tinytest,
     rmarkdown,
     scatterplot3d,
