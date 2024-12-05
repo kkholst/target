@@ -141,7 +141,7 @@ truncatedscore_estimate <- function(
       ee <- NULL
     }
     res0 <- res0 + best0
-    res <- structure(res, naive = list(res0, cmprisk = ee))
+    res <- structure(res, naive = list(res0, cmprsk = ee))
   }
   return(res)
 }
