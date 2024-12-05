@@ -49,6 +49,7 @@ jobs:
 
       - name: build
         run: |
+          make r_export
           cd build/R
           R CMD build targeted
 
