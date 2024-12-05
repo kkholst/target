@@ -1,3 +1,61 @@
+qprob <- function(corr) {
+  0.5 - mets::pmvn(upper = cbind(0, 0), sigma = corr, cor = TRUE)
+}
+
+prob.fct <- function(x, alpha, corr) {
+  q <- qprob(corr)
+  0.5 * pchisq(x, 1, lower.tail = FALSE) +
+    q * pchisq(x, 2, lower.tail = FALSE) - alpha
+}
+
+q.fct <- function(alpha, corr) {
+  uniroot(prob.fct,
+          alpha = alpha,
+          corr = corr,
+          interval = c(0, 10)
+  )$root
+}
+
+###############################################################
+## Calculating test statistics
+## Calculating p-values
+###############################################################
+testvals <- function(thetahat1,
+                     se1,
+                     thetahat2,
+                     se2,
+                     noninf1,
+                     noninf2,
+                     corr,
+                     alpha) {
+  z1 <- (thetahat1 - noninf1) / se1
+  z2 <- (thetahat2 - noninf2) / se2
+  zmin <- min(z1, z2)
+  zmax <- max(z1, z2)
+  SignWald.intersect <- ifelse(zmax >= 0 & zmin <= (corr * zmax), 1, 0) *
+    zmax * zmax + ifelse(zmax >= 0 & zmin > (corr * zmax),
+    (zmax * zmax + zmin * zmin - 2 * corr * zmax * zmin) / (1 - corr * corr),
+    0
+    )
+  SignWald1 <- ifelse(z1 >= 0, 1, 0) * z1^2
+  SignWald2 <- ifelse(z2 >= 0, 1, 0) * z2^2
+  critval.intersect <- q.fct(alpha, corr)
+  pval.intersect <- ifelse(SignWald.intersect > 0,
+                           prob.fct(SignWald.intersect, alpha, corr) + alpha, 1
+  )
+  pval1 <- ifelse(SignWald1 > 0, 0.5 * pchisq(SignWald1, 1, lower.tail = F), 1)
+  pval2 <- ifelse(SignWald2 > 0, 0.5 * pchisq(SignWald2, 1, lower.tail = F), 1)
+  cbind(
+    SignWald.intersect,
+    critval.intersect,
+    pval.intersect,
+    SignWald1,
+    pval1,
+    SignWald2,
+    pval2
+  )
+}
+
 ##' @description
 ##' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment variable,
 ##' \eqn{X} baseline covariates, \(T\) the failure time, and \(epsilon=1,2\)
@@ -113,7 +171,7 @@ truncatedscore_estimate <- function(
     b0 <- mets::binregATE(eventmod0,
       data = data, time = time,
       outcome = "cif", cause = cause, cens.code = cens.code, ...
-      )
+    )
     best0 <- estimate(
       coef = with(b0, c(riskDR, riskDR[2] - riskDR[1])),
       IC = with(b0, NROW(riskDR.iid) * cbind(
@@ -143,5 +201,11 @@ truncatedscore_estimate <- function(
     res0 <- res0 + best0
     res <- structure(res, naive = list(res0, cmprsk = ee))
   }
+  class(res) <- c("truncatedscore", class(res))
   return(res)
+}
+
+##' @export
+summary.truncatedscore <- function(object, ...) {
+  return(object)
 }
