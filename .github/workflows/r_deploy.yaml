@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - feature/truncatedscore
 
 jobs:
   r_targeted:
