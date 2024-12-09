@@ -10,7 +10,7 @@ truncatedscore_estimate(
   rmod,
   amod,
   eventmod,
-  time = 2,
+  time,
   cause = 1,
   cens.code = 0,
   naive = FALSE,
@@ -50,6 +50,24 @@ and \(epsilon=1,2\) the cause of failure.
 The following are our two target parameters
 \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
 \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
+}
+\examples{
+\dontrun{
+mod1 <- predictor_glm(y ~ a * (x1 + x2))
+mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
+a <- truncatedscore_estimate(
+  data = dat,
+  ymod = mod1,
+  rmod = mod2,
+  amod = a ~ 1,
+  eventmod = mets::Event(time, status) ~ a * (x1+x2),
+  time = 2
+)
+
+s <- summary(a)
+print(s)
+parameter(s)
+}
 }
 \author{
 Klaus Kähler Holst

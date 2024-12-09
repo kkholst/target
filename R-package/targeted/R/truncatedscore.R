@@ -64,15 +64,6 @@ test_intersectsignedwald <- function(thetahat1,
   pval2 <- ifelse(SignWald2 > 0,
     0.5 * pchisq(SignWald2, 1, lower.tail = FALSE), 1
   )
-  res <- cbind(
-    SignWald.intersect,
-    critval.intersect,
-    pval.intersect,
-    SignWald1,
-    pval1,
-    SignWald2,
-    pval2
-  )
   test.int <- structure(list(
     data.name = "H₀₁ ∩ H₀₂",
     statistic = c("Q" = unname(SignWald.intersect)),
@@ -105,6 +96,7 @@ test_intersectsignedwald <- function(thetahat1,
   ), class = "htest")
 
   list(
+    critval.intersect = critval.intersect,
     test.intersect = test.int,
     test.1 = test.1,
     test.2 = test.2
@@ -135,6 +127,23 @@ test_intersectsignedwald <- function(thetahat1,
 ##' @param ... additional arguments passed to lower level functions
 ##' @return estimate object
 ##' @author Klaus Kähler Holst
+##' @examples
+##' \dontrun{
+##' mod1 <- predictor_glm(y ~ a * (x1 + x2))
+##' mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
+##' a <- truncatedscore_estimate(
+##'   data = dat,
+##'   ymod = mod1,
+##'   rmod = mod2,
+##'   amod = a ~ 1,
+##'   eventmod = mets::Event(time, status) ~ a * (x1+x2),
+##'   time = 2
+##' )
+##'
+##' s <- summary(a)
+##' print(s)
+##' parameter(s)
+##' }
 ##' @export
 truncatedscore_estimate <- function(
                      data,
@@ -142,7 +151,7 @@ truncatedscore_estimate <- function(
                      rmod,
                      amod,
                      eventmod,
-                     time = 2,
+                     time,
                      cause = 1,
                      cens.code = 0,
                      naive = FALSE,
@@ -296,7 +305,7 @@ summary.truncatedscore <- function(object,
   res1 <- with(pval$test.1, cbind(estimate, statistic, p.value))
   rownames(res1) <- names(pval$test.1$estimate)
   res2 <- with(pval$test.2, cbind(estimate, statistic, p.value))
-  rownames(res1) <- names(pval$test.2$estimate)
+  rownames(res2) <- names(pval$test.2$estimate)
   res12 <- with(pval$test.intersect, cbind(NA, statistic, p.value))
   rownames(res12) <- "intersection"
   tests <- rbind(res1, res2, res12)
