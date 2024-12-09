@@ -64,7 +64,7 @@ a <- truncatedscore_estimate(
   time = 2
 )
 
-s <- summary(a)
+s <- summary(a, noninf.t = -0.1)
 print(s)
 parameter(s)
 }

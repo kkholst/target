@@ -140,7 +140,7 @@ test_intersectsignedwald <- function(thetahat1,
 ##'   time = 2
 ##' )
 ##'
-##' s <- summary(a)
+##' s <- summary(a, noninf.t = -0.1)
 ##' print(s)
 ##' parameter(s)
 ##' }
@@ -324,14 +324,20 @@ summary.truncatedscore <- function(object,
 
 ##' @export
 print.summary.truncatedscore <- function(x, ...) {
+  cat("\n")
+  cli::cli_rule("Parameter estimates")
   print(x$object)
-  cli::cli_rule()
+  cat("\n")
+  cli::cli_rule("One-sided tests")
+  cat("\nψ₁ = ", x$labels[1], "\n")
   print(x$test.1)
-  cat("ψ₁ = ", x$labels[1], "\n")
+  cli::cli_h3("")
+  cat("\nψ₂ = ", x$labels[2], "\n")
   print(x$test.2)
-  cat("ψ₂ = ", x$labels[2], "\n")
-  cli::cli_rule()
+  cli::cli_rule("Intersection test")
   print(x$test.intersect)
+  cli::cli_rule()
+  cat("\n")
 }
 
 ##' @export
