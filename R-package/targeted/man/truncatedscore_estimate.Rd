@@ -44,9 +44,10 @@ is returned as the attribute 'naive'}
 estimate object
 }
 \description{
-Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment variable,
-\eqn{X} baseline covariates, \(T\) the failure time, and \(epsilon=1,2\)
-the cause of failure. The following are our two target parameters
+Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
+variable, \eqn{X} baseline covariates, \(T\) the failure time,
+and \(epsilon=1,2\) the cause of failure.
+The following are our two target parameters
 \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
 \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
 }

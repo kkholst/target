@@ -29,6 +29,7 @@ Depends:
     R (>= 4.0),
     lava (>= 1.8.0)
 Imports:
+    cli,
     data.table,
     future.apply,
     nnls,

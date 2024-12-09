@@ -20,32 +20,51 @@ q.fct <- function(alpha, corr) {
 ## Calculating test statistics
 ## Calculating p-values
 ###############################################################
-testvals <- function(thetahat1,
-                     se1,
-                     thetahat2,
-                     se2,
-                     noninf1,
-                     noninf2,
-                     corr,
-                     alpha) {
+##' @title Signed intersection Wald test
+##' @param thetahat1 parameter estimate 1
+##' @param se1 standard error of parameter estimate 1
+##' @param thetahat2 parameter estimate 2
+##' @param se2 standard error of parameter estimate 2
+##' @param noninf1 non-inferiority margin for paramter 1
+##' @param noninf2 non-inferiority margin for paramter 2
+##' @param corr correlation between parameter 1 and 2
+##' @param alpha nominal level
+##' @author
+##' Christian Bressen Pipper,
+##' Klaus Kähler Holst
+##' @return list with Wald
+##' @author Klaus Kähler Holst
+test_intersectsignedwald <- function(thetahat1,
+                                     se1,
+                                     thetahat2,
+                                     se2,
+                                     noninf1,
+                                     noninf2,
+                                     corr,
+                                     alpha) {
   z1 <- (thetahat1 - noninf1) / se1
   z2 <- (thetahat2 - noninf2) / se2
   zmin <- min(z1, z2)
   zmax <- max(z1, z2)
   SignWald.intersect <- ifelse(zmax >= 0 & zmin <= (corr * zmax), 1, 0) *
     zmax * zmax + ifelse(zmax >= 0 & zmin > (corr * zmax),
-    (zmax * zmax + zmin * zmin - 2 * corr * zmax * zmin) / (1 - corr * corr),
-    0
+      (zmax * zmax + zmin * zmin - 2 * corr * zmax * zmin) / (1 - corr * corr),
+      0
     )
   SignWald1 <- ifelse(z1 >= 0, 1, 0) * z1^2
   SignWald2 <- ifelse(z2 >= 0, 1, 0) * z2^2
   critval.intersect <- q.fct(alpha, corr)
   pval.intersect <- ifelse(SignWald.intersect > 0,
-                           prob.fct(SignWald.intersect, alpha, corr) + alpha, 1
+    ## prob.fct(SignWald.intersect, alpha, corr) + alpha, 1
+    prob.fct(SignWald.intersect, 0, corr), 1
+    )
+  pval1 <- ifelse(SignWald1 > 0,
+    0.5 * pchisq(SignWald1, 1, lower.tail = FALSE), 1
   )
-  pval1 <- ifelse(SignWald1 > 0, 0.5 * pchisq(SignWald1, 1, lower.tail = F), 1)
-  pval2 <- ifelse(SignWald2 > 0, 0.5 * pchisq(SignWald2, 1, lower.tail = F), 1)
-  cbind(
+  pval2 <- ifelse(SignWald2 > 0,
+    0.5 * pchisq(SignWald2, 1, lower.tail = FALSE), 1
+  )
+  res <- cbind(
     SignWald.intersect,
     critval.intersect,
     pval.intersect,
@@ -54,12 +73,51 @@ testvals <- function(thetahat1,
     SignWald2,
     pval2
   )
+  test.int <- structure(list(
+    data.name = "H₀₁ ∩ H₀₂",
+    statistic = c("Q" = unname(SignWald.intersect)),
+    parameter = NULL,
+    method = "Signed Wald Intersection Test",
+    ## null.value = "one",
+    ## alternative = "one.sided",
+    p.value = pval.intersect
+    ## estimate = 1
+  ), class = "htest")
+  test.1 <- structure(list(
+    data.name = sprintf("H₀₁: ψ₁ ≤ %g", noninf1),
+    statistic = c("Q" = unname(SignWald1)),
+    estimate = c("ψ₁" = unname(thetahat1)),
+    parameter = NULL,
+    method = "Signed Wald Test",
+    ## null.value = noninf1,
+    alternative = sprintf("Hₐ₁: ψ₁ > %g", noninf1),
+    p.value = pval1
+  ), class = "htest")
+  test.2 <- structure(list(
+    data.name = sprintf("H₀₂: ψ₂ ≤ %g", noninf2),
+    statistic = c("Q" = unname(SignWald2)),
+    estimate = c("ψ₂" = unname(thetahat2)),
+    parameter = NULL,
+    method = "Signed Wald Test",
+    alternative = sprintf("Hₐ₂: ψ₂ > %g", noninf2),
+    p.value = pval2
+    ## estimate = 1
+  ), class = "htest")
+
+  list(
+    test.intersect = test.int,
+    test.1 = test.1,
+    test.2 = test.2
+  )
+
 }
 
+
 ##' @description
-##' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment variable,
-##' \eqn{X} baseline covariates, \(T\) the failure time, and \(epsilon=1,2\)
-##' the cause of failure. The following are our two target parameters
+##' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
+##' variable, \eqn{X} baseline covariates, \(T\) the failure time,
+##' and \(epsilon=1,2\) the cause of failure.
+##' The following are our two target parameters
 ##' \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
 ##' \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
 ##' @title Estimation of mean clinical outcome truncated by event process
@@ -136,7 +194,7 @@ truncatedscore_estimate <- function(
     est1 <- m1 + mean(ic1)
     ic <- cbind(ic, ic1 - mean(ic1))
     est <- c(est, est1)
-    lab0 <- c(lab0, sprintf("E(Y|R=1,A=%g)", aval))
+    lab0 <- c(lab0, sprintf("E(Y|T≥%d,A=%d)", time, aval))
   }
   lab0 <- c(lab0, "diff")
   res <- estimate(
@@ -153,7 +211,7 @@ truncatedscore_estimate <- function(
     ...
     )
   lab <- paste0(gsub(
-    "^treat", sprintf("Risk\\(T<%g|A=",time),
+    "^treat", sprintf("Risk\\(T<%d|A=", time),
     names(b$riskDR)[1:2]), ")")
   lab <- c(lab, "riskdiff")
   best <- estimate(
@@ -190,7 +248,7 @@ truncatedscore_estimate <- function(
       cc <- cmprsk::cuminc(data$time, data$status, data$a)
       F1.a0 <- cmprsk::timepoints(cc["0 1"], 2)
       F1.a1 <- cmprsk::timepoints(cc["1 1"], 2)
-      laab <- paste0("cmprsk.", lab)
+      lab <- paste0("cmprsk.", lab)
       ee <- estimate(
         coef = c(F1.a0$est, F1.a1$est),
         vcov = diag(c(F1.a0$var, F1.a1$var))
@@ -201,11 +259,77 @@ truncatedscore_estimate <- function(
     res0 <- res0 + best0
     res <- structure(res, naive = list(res0, cmprsk = ee))
   }
+  res$landmark.time <- time
   class(res) <- c("truncatedscore", class(res))
   return(res)
 }
 
 ##' @export
-summary.truncatedscore <- function(object, ...) {
-  return(object)
+summary.truncatedscore <- function(object,
+                                   noninf.y = 0,
+                                   noninf.t = 0,
+                                   alpha = 0.05,
+                                   parameter.sign = c(y = 1L, t = -1L),
+                                   ...) {
+
+  idx <- if (sign(parameter.sign[1]) < 0) c(1, 2) else c(2, 1)
+  idx <- c(idx, if (sign(parameter.sign[2]) < 0) c(4, 5) else c(5, 4))
+  nn <- names(coef(object))
+  lab <- c(paste0(nn[idx[1]], " - ", nn[idx[2]]),
+    paste0(nn[idx[3]], " - ", nn[idx[4]])
+  )
+  B <- matrix(0, 2, 6)
+  B[1, idx[1:2]] <- c(1, -1)
+  B[2, idx[3:4]] <- c(1, -1)
+  est <- estimate(object, B)
+  args <- list(
+    thetahat1 = coef(est)[1],
+    se1 = vcov(est)[1, 1]**.5,
+    thetahat2 = coef(est)[2],
+    se2 = vcov(est)[2, 2]**.5,
+    corr = cov2cor(vcov(est))[1, 2],
+    noninf1 = noninf.y,
+    noninf2 = noninf.t,
+    alpha = alpha
+  )
+  pval <- do.call(test_intersectsignedwald, args)
+  res1 <- with(pval$test.1, cbind(estimate, statistic, p.value))
+  rownames(res1) <- names(pval$test.1$estimate)
+  res2 <- with(pval$test.2, cbind(estimate, statistic, p.value))
+  rownames(res1) <- names(pval$test.2$estimate)
+  res12 <- with(pval$test.intersect, cbind(NA, statistic, p.value))
+  rownames(res12) <- "intersection"
+  tests <- rbind(res1, res2, res12)
+  res <- c(list(
+    object = object,
+    alpha = alpha,
+    estimate = est,
+    nonfinf.y = noninf.y,
+    noninf.t = noninf.t,
+    labels = lab,
+    tests = tests
+  ), pval)
+  class(res) <- "summary.truncatedscore"
+  return(res)
+}
+
+##' @export
+print.summary.truncatedscore <- function(x, ...) {
+  print(x$object)
+  cli::cli_rule()
+  print(x$test.1)
+  cat("ψ₁ = ", x$labels[1], "\n")
+  print(x$test.2)
+  cat("ψ₂ = ", x$labels[2], "\n")
+  cli::cli_rule()
+  print(x$test.intersect)
+}
+
+##' @export
+parameter.summary.truncatedscore <- function(x, ...) {
+  x$tests
+}
+##' @export
+coef.summary.truncatedscore <- function(object, ...) {
+  object$tests
 }
