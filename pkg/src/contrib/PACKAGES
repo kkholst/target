@@ -1,12 +1,12 @@
 Package: targeted
 Version: 0.6
-Depends: R (>= 4.0), lava (>= 1.8.0)
-Imports: data.table, future.apply, nnls, optimx, progressr, methods,
-        mets, R6, Rcpp (>= 1.0.0), rlang, survival
+Depends: R (>= 4.0), lava (>= 1.8.0), survival
+Imports: cli, data.table, future.apply, nnls, optimx, progressr,
+        methods, mets, R6, Rcpp (>= 1.0.0), rlang
 LinkingTo: Rcpp, RcppArmadillo
 Suggests: cmprsk, e1071, glmnet, grf, hal9001, mgcv, tinytest,
         rmarkdown, scatterplot3d, SuperLearner (>= 2.0-28), knitr,
         xgboost, viridisLite
 License: Apache License (== 2.0)
-MD5sum: 8e5a69c2d0876d9c82bbb3eefc60c41a
+MD5sum: a9136d30f27357485c1af352eee03b41
 NeedsCompilation: yes
