@@ -65,7 +65,7 @@ test_intersectsignedwald <- function(thetahat1,
     0.5 * pchisq(SignWald2, 1, lower.tail = FALSE), 1
   )
   test.int <- structure(list(
-    data.name = "H₀₁ ∩ H₀₂",
+    data.name = "H1 ^ H2",
     statistic = c("Q" = unname(SignWald.intersect)),
     parameter = NULL,
     method = "Signed Wald Intersection Test",
@@ -75,22 +75,22 @@ test_intersectsignedwald <- function(thetahat1,
     ## estimate = 1
   ), class = "htest")
   test.1 <- structure(list(
-    data.name = sprintf("H₀₁: ψ₁ ≤ %g", noninf1),
+    data.name = sprintf("H1: b1 ≤ %g", noninf1),
     statistic = c("Q" = unname(SignWald1)),
-    estimate = c("ψ₁" = unname(thetahat1)),
+    estimate = c("b1" = unname(thetahat1)),
     parameter = NULL,
     method = "Signed Wald Test",
     ## null.value = noninf1,
-    alternative = sprintf("Hₐ₁: ψ₁ > %g", noninf1),
+    alternative = sprintf("HA1: b1 > %g", noninf1),
     p.value = pval1
   ), class = "htest")
   test.2 <- structure(list(
-    data.name = sprintf("H₀₂: ψ₂ ≤ %g", noninf2),
+    data.name = sprintf("H2: b2 ≤ %g", noninf2),
     statistic = c("Q" = unname(SignWald2)),
-    estimate = c("ψ₂" = unname(thetahat2)),
+    estimate = c("b2" = unname(thetahat2)),
     parameter = NULL,
     method = "Signed Wald Test",
-    alternative = sprintf("Hₐ₂: ψ₂ > %g", noninf2),
+    alternative = sprintf("HA2: b2 > %g", noninf2),
     p.value = pval2
     ## estimate = 1
   ), class = "htest")
@@ -329,10 +329,10 @@ print.summary.truncatedscore <- function(x, ...) {
   print(x$object)
   cat("\n")
   cli::cli_rule("One-sided tests")
-  cat("\nψ₁ = ", x$labels[1], "\n")
+  cat("\nb1 = ", x$labels[1], "\n")
   print(x$test.1)
   cli::cli_h3("")
-  cat("\nψ₂ = ", x$labels[2], "\n")
+  cat("\nb2 = ", x$labels[2], "\n")
   print(x$test.2)
   cli::cli_rule("Intersection test")
   print(x$test.intersect)
