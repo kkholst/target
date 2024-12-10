@@ -151,7 +151,7 @@ r_export_clean:
 r_drat: r_export_clean r_export
 	@if [ ! -d "www" ]; then git clone -b gh-pages git@github.com:kkholst/target www; fi;
 	@cd build/R; $(R) CMD build $(pkg)
-	@echo 'drat::insertPackage(action="archive", repodir="www/pkg", file=paste0("build/R/", list.files("build/R/", "gz$")))' | $(R)
+	@echo 'drat::insertPackage(action="archive", repodir="www/pkg", file=paste0("build/R/", list.files("build/R/", "gz$$")))' | $(R)
 	@cd www; git commit -a -m "pkg update"; git push
 
 ##################################################
