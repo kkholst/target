@@ -75,7 +75,7 @@ test_intersectsignedwald <- function(thetahat1,
     ## estimate = 1
   ), class = "htest")
   test.1 <- structure(list(
-    data.name = sprintf("H1: b1 ≤ %g", noninf1),
+    data.name = sprintf("H1: b1 <= %g", noninf1),
     statistic = c("Q" = unname(SignWald1)),
     estimate = c("b1" = unname(thetahat1)),
     parameter = NULL,
@@ -85,7 +85,7 @@ test_intersectsignedwald <- function(thetahat1,
     p.value = pval1
   ), class = "htest")
   test.2 <- structure(list(
-    data.name = sprintf("H2: b2 ≤ %g", noninf2),
+    data.name = sprintf("H2: b2 <= %g", noninf2),
     statistic = c("Q" = unname(SignWald2)),
     estimate = c("b2" = unname(thetahat2)),
     parameter = NULL,
@@ -203,7 +203,7 @@ truncatedscore_estimate <- function(
     est1 <- m1 + mean(ic1)
     ic <- cbind(ic, ic1 - mean(ic1))
     est <- c(est, est1)
-    lab0 <- c(lab0, sprintf("E(Y|T≥%d,A=%d)", time, aval))
+    lab0 <- c(lab0, sprintf("E(Y|T>=%d,A=%d)", time, aval))
   }
   lab0 <- c(lab0, "diff")
   res <- estimate(
