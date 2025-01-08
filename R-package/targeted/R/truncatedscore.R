@@ -33,7 +33,6 @@ q.fct <- function(alpha, corr) {
 ##' Christian Bressen Pipper,
 ##' Klaus Kähler Holst
 ##' @return list with Wald
-##' @author Klaus Kähler Holst
 test_intersectsignedwald <- function(thetahat1,
                                      se1,
                                      thetahat2,
@@ -253,20 +252,8 @@ truncatedscore_estimate <- function(
       labels = lab0,
       id = rownames(data)
     )
-    if (requireNamespace("cmprsk", quietly = TRUE)) {
-      cc <- cmprsk::cuminc(data$time, data$status, data$a)
-      F1.a0 <- cmprsk::timepoints(cc["0 1"], 2)
-      F1.a1 <- cmprsk::timepoints(cc["1 1"], 2)
-      lab <- paste0("cmprsk.", lab)
-      ee <- estimate(
-        coef = c(F1.a0$est, F1.a1$est),
-        vcov = diag(c(F1.a0$var, F1.a1$var))
-      ) |> estimate(cbind(c(1, 0, -1), c(0, 1, 1)), labels = lab)
-    } else {
-      ee <- NULL
-    }
     res0 <- res0 + best0
-    res <- structure(res, naive = list(res0, cmprsk = ee))
+    res <- structure(res, naive = list(res0))
   }
   res$landmark.time <- time
   class(res) <- c("truncatedscore", class(res))
