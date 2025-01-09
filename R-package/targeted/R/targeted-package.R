@@ -15,7 +15,7 @@
 ##'   lm.wfit lm.fit glm lm coef vcov model.frame model.matrix na.pass nlminb
 ##'   predict dnorm quantile terms weighted.mean runif .getXlevels
 ##'   delete.response model.response gaussian formula model.offset reformulate
-##'   drop.terms weights model.extract
+##'   drop.terms weights model.extract cov2cor pchisq uniroot
 ##' @importFrom rlang hash call_match
 ##' @importFrom optimx optimx
 ##' @importFrom data.table data.table is.data.table
@@ -27,7 +27,7 @@
 ##' @author Klaus K. Holst (Maintainer) <klaus@@holst.it>
 ##' @keywords package
 ##' @examples
-##' \dontrun{
+##' \dontrun{x
 ##' example(riskreg)
 ##' example(cate)
 ##' example(ate)

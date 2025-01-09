@@ -202,7 +202,7 @@ truncatedscore_estimate <- function(
     est1 <- m1 + mean(ic1)
     ic <- cbind(ic, ic1 - mean(ic1))
     est <- c(est, est1)
-    lab0 <- c(lab0, sprintf("E(Y|T>=%d,A=%d)", time, aval))
+    lab0 <- c(lab0, sprintf("E(Y|T>=%f,A=%s)", time, aval))
   }
   lab0 <- c(lab0, "diff")
   res <- estimate(
@@ -219,7 +219,7 @@ truncatedscore_estimate <- function(
     ...
     )
   lab <- paste0(gsub(
-    "^treat", sprintf("Risk\\(T<%d|A=", time),
+    "^treat", sprintf("Risk\\(T<%f|A=", time),
     names(b$riskDR)[1:2]), ")")
   lab <- c(lab, "riskdiff")
   best <- estimate(
