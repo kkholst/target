@@ -41,6 +41,4 @@ Signed intersection Wald test
 \author{
 Christian Bressen Pipper,
 Klaus Kähler Holst
-
-Klaus Kähler Holst
 }
