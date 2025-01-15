@@ -24,9 +24,9 @@ test_intersectsignedwald(
 
 \item{se2}{standard error of parameter estimate 2}
 
-\item{noninf1}{non-inferiority margin for paramter 1}
+\item{noninf1}{non-inferiority margin for parameter 1}
 
-\item{noninf2}{non-inferiority margin for paramter 2}
+\item{noninf2}{non-inferiority margin for parameter 2}
 
 \item{corr}{correlation between parameter 1 and 2}
 

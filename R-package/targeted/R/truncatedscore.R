@@ -25,8 +25,8 @@ q.fct <- function(alpha, corr) {
 ##' @param se1 standard error of parameter estimate 1
 ##' @param thetahat2 parameter estimate 2
 ##' @param se2 standard error of parameter estimate 2
-##' @param noninf1 non-inferiority margin for paramter 1
-##' @param noninf2 non-inferiority margin for paramter 2
+##' @param noninf1 non-inferiority margin for parameter 1
+##' @param noninf2 non-inferiority margin for parameter 2
 ##' @param corr correlation between parameter 1 and 2
 ##' @param alpha nominal level
 ##' @author
@@ -106,15 +106,15 @@ test_intersectsignedwald <- function(thetahat1,
 
 ##' @description
 ##' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
-##' variable, \eqn{X} baseline covariates, \(T\) the failure time,
-##' and \(epsilon=1,2\) the cause of failure.
+##' variable, \eqn{X} baseline covariates, \eqn{T} the failure time,
+##' and \eqn{epsilon=1,2} the cause of failure.
 ##' The following are our two target parameters
 ##' \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
 ##' \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
 ##' @title Estimation of mean clinical outcome truncated by event process
 ##' @param data data.frame
 ##' @param ymod model for clinical outcome given T>time
-##' @param rmod model for missing data mechnaism for clinical outcome at T=time
+##' @param rmod model for missing data mechanism for clinical outcome at T=time
 ##' @param amod treatment model (in RCT should just be 'a ~ 1')
 ##' @param eventmod Model for time-to-event process ('Event(time,status) ~ x')
 ##' @param time landmark time

@@ -22,7 +22,7 @@ truncatedscore_estimate(
 
 \item{ymod}{model for clinical outcome given T>time}
 
-\item{rmod}{model for missing data mechnaism for clinical outcome at T=time}
+\item{rmod}{model for missing data mechanism for clinical outcome at T=time}
 
 \item{amod}{treatment model (in RCT should just be 'a ~ 1')}
 
@@ -45,8 +45,8 @@ estimate object
 }
 \description{
 Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
-variable, \eqn{X} baseline covariates, \(T\) the failure time,
-and \(epsilon=1,2\) the cause of failure.
+variable, \eqn{X} baseline covariates, \eqn{T} the failure time,
+and \eqn{epsilon=1,2} the cause of failure.
 The following are our two target parameters
 \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
 \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
