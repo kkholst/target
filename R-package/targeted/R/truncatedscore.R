@@ -2,14 +2,14 @@ qprob <- function(corr) {
   0.5 - mets::pmvn(upper = cbind(0, 0), sigma = corr, cor = TRUE)
 }
 
-prob.fct <- function(x, alpha, corr) {
+prob_fct <- function(x, alpha, corr) {
   q <- qprob(corr)
   0.5 * pchisq(x, 1, lower.tail = FALSE) +
     q * pchisq(x, 2, lower.tail = FALSE) - alpha
 }
 
-q.fct <- function(alpha, corr) {
-  uniroot(prob.fct,
+q_fct <- function(alpha, corr) {
+  uniroot(prob_fct,
           alpha = alpha,
           corr = corr,
           interval = c(0, 10)
@@ -52,10 +52,10 @@ test_intersectsignedwald <- function(thetahat1,
     )
   SignWald1 <- ifelse(z1 >= 0, 1, 0) * z1^2
   SignWald2 <- ifelse(z2 >= 0, 1, 0) * z2^2
-  critval.intersect <- q.fct(alpha, corr)
+  critval.intersect <- q_fct(alpha, corr)
   pval.intersect <- ifelse(SignWald.intersect > 0,
-    ## prob.fct(SignWald.intersect, alpha, corr) + alpha, 1
-    prob.fct(SignWald.intersect, 0, corr), 1
+    ## prob_fct(SignWald.intersect, alpha, corr) + alpha, 1
+    prob_fct(SignWald.intersect, 0, corr), 1
     )
   pval1 <- ifelse(SignWald1 > 0,
     0.5 * pchisq(SignWald1, 1, lower.tail = FALSE), 1
@@ -130,7 +130,7 @@ test_intersectsignedwald <- function(thetahat1,
 ##' \dontrun{
 ##' mod1 <- predictor_glm(y ~ a * (x1 + x2))
 ##' mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
-##' a <- truncatedscore_estimate(
+##' a <- estimate_truncatedscore(
 ##'   data = dat,
 ##'   ymod = mod1,
 ##'   rmod = mod2,
@@ -144,7 +144,7 @@ test_intersectsignedwald <- function(thetahat1,
 ##' parameter(s)
 ##' }
 ##' @export
-truncatedscore_estimate <- function(
+estimate_truncatedscore <- function(
                      data,
                      ymod,
                      rmod,
