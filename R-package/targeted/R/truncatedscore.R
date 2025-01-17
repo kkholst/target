@@ -123,7 +123,7 @@ test_intersectsignedwald <- function(thetahat1,
 #' @param cens.code censoring code (0 default)
 #' @param naive if TRUE the unadjusted estimates ignoring baseline covariates
 #'   is returned as the attribute 'naive'
-#' @param ... additional arguments passed to lower level functions
+#' @param ... additional arguments passed to [mets::binregATE]
 #' @return estimate object
 #' @author Klaus Kähler Holst
 #' @examples

@@ -35,10 +35,10 @@ statement)}
 
 \item{cens.code}{censoring code (0 default)}
 
-\item{naive}{ff TRUE the unadjusted estimates ignoring baseline covariates
+\item{naive}{if TRUE the unadjusted estimates ignoring baseline covariates
 is returned as the attribute 'naive'}
 
-\item{...}{additional arguments passed to lower level functions}
+\item{...}{additional arguments passed to \link[mets:binregATE]{mets::binregATE}}
 }
 \value{
 estimate object
