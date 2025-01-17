@@ -17,22 +17,22 @@ q_fct <- function(alpha, corr) {
 }
 
 ###############################################################
-## Calculating test statistics
-## Calculating p-values
+# Calculating test statistics
+# Calculating p-values
 ###############################################################
-##' @title Signed intersection Wald test
-##' @param thetahat1 parameter estimate 1
-##' @param se1 standard error of parameter estimate 1
-##' @param thetahat2 parameter estimate 2
-##' @param se2 standard error of parameter estimate 2
-##' @param noninf1 non-inferiority margin for parameter 1
-##' @param noninf2 non-inferiority margin for parameter 2
-##' @param corr correlation between parameter 1 and 2
-##' @param alpha nominal level
-##' @author
-##' Christian Bressen Pipper,
-##' Klaus Kähler Holst
-##' @return list with Wald
+#' @title Signed intersection Wald test
+#' @param thetahat1 parameter estimate 1
+#' @param se1 standard error of parameter estimate 1
+#' @param thetahat2 parameter estimate 2
+#' @param se2 standard error of parameter estimate 2
+#' @param noninf1 non-inferiority margin for parameter 1
+#' @param noninf2 non-inferiority margin for parameter 2
+#' @param corr correlation between parameter 1 and 2
+#' @param alpha nominal level
+#' @author
+#' Christian Bressen Pipper,
+#' Klaus Kähler Holst
+#' @return list with Wald
 test_intersectsignedwald <- function(thetahat1,
                                      se1,
                                      thetahat2,
@@ -54,7 +54,7 @@ test_intersectsignedwald <- function(thetahat1,
   SignWald2 <- ifelse(z2 >= 0, 1, 0) * z2^2
   critval.intersect <- q_fct(alpha, corr)
   pval.intersect <- ifelse(SignWald.intersect > 0,
-    ## prob_fct(SignWald.intersect, alpha, corr) + alpha, 1
+    # prob_fct(SignWald.intersect, alpha, corr) + alpha, 1
     prob_fct(SignWald.intersect, 0, corr), 1
     )
   pval1 <- ifelse(SignWald1 > 0,
@@ -68,10 +68,10 @@ test_intersectsignedwald <- function(thetahat1,
     statistic = c("Q" = unname(SignWald.intersect)),
     parameter = NULL,
     method = "Signed Wald Intersection Test",
-    ## null.value = "one",
-    ## alternative = "one.sided",
+    # null.value = "one",
+    # alternative = "one.sided",
     p.value = pval.intersect
-    ## estimate = 1
+    # estimate = 1
   ), class = "htest")
   test.1 <- structure(list(
     data.name = sprintf("H1: b1 <= %g", noninf1),
@@ -79,7 +79,7 @@ test_intersectsignedwald <- function(thetahat1,
     estimate = c("b1" = unname(thetahat1)),
     parameter = NULL,
     method = "Signed Wald Test",
-    ## null.value = noninf1,
+    # null.value = noninf1,
     alternative = sprintf("HA1: b1 > %g", noninf1),
     p.value = pval1
   ), class = "htest")
@@ -91,7 +91,7 @@ test_intersectsignedwald <- function(thetahat1,
     method = "Signed Wald Test",
     alternative = sprintf("HA2: b2 > %g", noninf2),
     p.value = pval2
-    ## estimate = 1
+    # estimate = 1
   ), class = "htest")
 
   list(
@@ -104,46 +104,46 @@ test_intersectsignedwald <- function(thetahat1,
 }
 
 
-##' @description
-##' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
-##' variable, \eqn{X} baseline covariates, \eqn{T} the failure time,
-##' and \eqn{epsilon=1,2} the cause of failure.
-##' The following are our two target parameters
-##' \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
-##' \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
-##' @title Estimation of mean clinical outcome truncated by event process
-##' @param data data.frame
-##' @param mod.y model for clinical outcome given T>time
-##' @param mod.r model for missing data mechanism for clinical outcome at T=time
-##' @param mod.a treatment model (in RCT should just be 'a ~ 1')
-##' @param mod.event Model for time-to-event process ('Event(time,status) ~ x')
-##' @param time landmark time
-##' @param cause primary event (in the 'status' variable of the 'Event'
-##'   statement)
-##' @param cens.code censoring code (0 default)
-##' @param naive if TRUE the unadjusted estimates ignoring baseline covariates
-##'   is returned as the attribute 'naive'
-##' @param ... additional arguments passed to lower level functions
-##' @return estimate object
-##' @author Klaus Kähler Holst
-##' @examples
-##' \dontrun{
-##' mod1 <- predictor_glm(y ~ a * (x1 + x2))
-##' mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
-##' a <- estimate_truncatedscore(
-##'   data = dat,
-##'   mod.y = mod1,
-##'   mod.r = mod2,
-##'   mod.a = a ~ 1,
-##'   mod.event = mets::Event(time, status) ~ a * (x1+x2),
-##'   time = 2
-##' )
-##'
-##' s <- summary(a, noninf.t = -0.1)
-##' print(s)
-##' parameter(s)
-##' }
-##' @export
+#' @description
+#' Let \eqn{Y} denote the clinical outcome, \eqn{A} the binary treatment
+#' variable, \eqn{X} baseline covariates, \eqn{T} the failure time,
+#' and \eqn{epsilon=1,2} the cause of failure.
+#' The following are our two target parameters
+#' \deqn{E(Y|T>t, A=1)- E(Y|T>t, A=0)}
+#' \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
+#' @title Estimation of mean clinical outcome truncated by event process
+#' @param data data.frame
+#' @param mod.y model for clinical outcome given T>time
+#' @param mod.r model for missing data mechanism for clinical outcome at T=time
+#' @param mod.a treatment model (in RCT should just be 'a ~ 1')
+#' @param mod.event Model for time-to-event process ('Event(time,status) ~ x')
+#' @param time landmark time
+#' @param cause primary event (in the 'status' variable of the 'Event'
+#'   statement)
+#' @param cens.code censoring code (0 default)
+#' @param naive if TRUE the unadjusted estimates ignoring baseline covariates
+#'   is returned as the attribute 'naive'
+#' @param ... additional arguments passed to lower level functions
+#' @return estimate object
+#' @author Klaus Kähler Holst
+#' @examples
+#' \dontrun{
+#' mod1 <- predictor_glm(y ~ a * (x1 + x2))
+#' mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
+#' a <- estimate_truncatedscore(
+#'   data = dat,
+#'   mod.y = mod1,
+#'   mod.r = mod2,
+#'   mod.a = a ~ 1,
+#'   mod.event = mets::Event(time, status) ~ a * (x1+x2),
+#'   time = 2
+#' )
+#'
+#' s <- summary(a, noninf.t = -0.1)
+#' print(s)
+#' parameter(s)
+#' }
+#' @export
 estimate_truncatedscore <- function(
                      data,
                      mod.y,
@@ -260,7 +260,7 @@ estimate_truncatedscore <- function(
   return(res)
 }
 
-##' @export
+#' @export
 summary.truncatedscore <- function(object,
                                    noninf.y = 0,
                                    noninf.t = 0,
@@ -309,7 +309,7 @@ summary.truncatedscore <- function(object,
   return(res)
 }
 
-##' @export
+#' @export
 print.summary.truncatedscore <- function(x, ...) {
   cat("\n")
   cli::cli_rule("Parameter estimates")
@@ -327,11 +327,11 @@ print.summary.truncatedscore <- function(x, ...) {
   cat("\n")
 }
 
-##' @export
+#' @export
 parameter.summary.truncatedscore <- function(x, ...) {
   x$tests
 }
-##' @export
+#' @export
 coef.summary.truncatedscore <- function(object, ...) {
   object$tests
 }
