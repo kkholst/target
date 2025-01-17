@@ -113,15 +113,15 @@ test_intersectsignedwald <- function(thetahat1,
 ##' \deqn{P(T<t,\epsilon=1|A=1)- P(T<t,\epsilon=1|A=0)}
 ##' @title Estimation of mean clinical outcome truncated by event process
 ##' @param data data.frame
-##' @param ymod model for clinical outcome given T>time
-##' @param rmod model for missing data mechanism for clinical outcome at T=time
-##' @param amod treatment model (in RCT should just be 'a ~ 1')
-##' @param eventmod Model for time-to-event process ('Event(time,status) ~ x')
+##' @param mod.y model for clinical outcome given T>time
+##' @param mod.r model for missing data mechanism for clinical outcome at T=time
+##' @param mod.a treatment model (in RCT should just be 'a ~ 1')
+##' @param mod.event Model for time-to-event process ('Event(time,status) ~ x')
 ##' @param time landmark time
 ##' @param cause primary event (in the 'status' variable of the 'Event'
 ##'   statement)
 ##' @param cens.code censoring code (0 default)
-##' @param naive ff TRUE the unadjusted estimates ignoring baseline covariates
+##' @param naive if TRUE the unadjusted estimates ignoring baseline covariates
 ##'   is returned as the attribute 'naive'
 ##' @param ... additional arguments passed to lower level functions
 ##' @return estimate object
@@ -132,10 +132,10 @@ test_intersectsignedwald <- function(thetahat1,
 ##' mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
 ##' a <- estimate_truncatedscore(
 ##'   data = dat,
-##'   ymod = mod1,
-##'   rmod = mod2,
-##'   amod = a ~ 1,
-##'   eventmod = mets::Event(time, status) ~ a * (x1+x2),
+##'   mod.y = mod1,
+##'   mod.r = mod2,
+##'   mod.a = a ~ 1,
+##'   mod.event = mets::Event(time, status) ~ a * (x1+x2),
 ##'   time = 2
 ##' )
 ##'
@@ -146,39 +146,39 @@ test_intersectsignedwald <- function(thetahat1,
 ##' @export
 estimate_truncatedscore <- function(
                      data,
-                     ymod,
-                     rmod,
-                     amod,
-                     eventmod,
+                     mod.y,
+                     mod.r,
+                     mod.a,
+                     mod.event,
                      time,
                      cause = 1,
                      cens.code = 0,
                      naive = FALSE,
                      ...
                      ) {
-  if (inherits(ymod, "formula")) {
-    ymod <- predictor_glm(ymod)
+  if (inherits(mod.y, "formula")) {
+    mod.y <- predictor_glm(mod.y)
   }
-  if (inherits(rmod, "formula")) {
-    rmod <- predictor_glm(rmod, family = binomial)
+  if (inherits(mod.r, "formula")) {
+    mod.r <- predictor_glm(mod.r, family = binomial)
   }
-  if (inherits(amod, "formula")) {
-    amod <- predictor_glm(amod, family = binomial)
+  if (inherits(mod.a, "formula")) {
+    mod.a <- predictor_glm(mod.a, family = binomial)
   }
   # Missing data model
-  rmod$estimate(data)
-  r <- rmod$response(data) == 1
+  mod.r$estimate(data)
+  r <- mod.r$response(data) == 1
   # Data with Y observed
   d1 <- data[which(r), , drop = TRUE]
   # Outcome model E(Y|R=1,X,A)
-  ymod$estimate(d1)
+  mod.y$estimate(d1)
   # Treatment model
-  amod$estimate(data)
-  a <- amod$response(data)
-  a0 <- amod$response(data, eval = FALSE)
-  treatment <- all.vars(update(amod$formula, ~1))
+  mod.a$estimate(data)
+  a <- mod.a$response(data)
+  a0 <- mod.a$response(data, eval = FALSE)
+  treatment <- all.vars(update(mod.a$formula, ~1))
   alev <- c(a0[which(a==0)[1]], a0[which(a==1)[1]])
-  y <- ymod$response(data, na.action=lava::na.pass0)
+  y <- mod.y$response(data, na.action=lava::na.pass0)
   tmpdata <- data
   est <- ic <-
     lab0 <- est.naive <-
@@ -186,9 +186,9 @@ estimate_truncatedscore <- function(
   for (aval in c(0, 1)) {
     Ia <- (a == aval)
     tmpdata[, treatment] <- alev[aval + 1]
-    q1 <- ymod$predict(tmpdata)
-    q2 <- rmod$predict(tmpdata)
-    pa <- amod$predict(tmpdata)
+    q1 <- mod.y$predict(tmpdata)
+    q2 <- mod.r$predict(tmpdata)
+    pa <- mod.a$predict(tmpdata)
     p <- pa[which(a == 1)[1]]
     if (aval == 0) pa <- 1 - pa
     idx1 <- which(Ia)
@@ -212,8 +212,8 @@ estimate_truncatedscore <- function(
     id = rownames(data)
   )
   data[, treatment] <- factor(data[, treatment])
-  eventmod <- update(eventmod, as.formula(sprintf("~ %s+ .", treatment)))
-  b <- mets::binregATE(eventmod,
+  mod.event <- update(mod.event, as.formula(sprintf("~ %s+ .", treatment)))
+  b <- mets::binregATE(mod.event,
     data = data, time = time,
     outcome = "cif", cause = cause, cens.code = cens.code,
     ...
@@ -233,7 +233,7 @@ estimate_truncatedscore <- function(
   best <- estimate(best, labels=lab)
   res <- merge(res, best)
   if (naive) {
-    eventmod0 <- update(eventmod, as.formula(sprintf("~ %s", treatment)))
+    eventmod0 <- update(mod.event, as.formula(sprintf("~ %s", treatment)))
     b0 <- mets::binregATE(eventmod0,
       data = data, time = time,
       outcome = "cif", cause = cause, cens.code = cens.code, ...

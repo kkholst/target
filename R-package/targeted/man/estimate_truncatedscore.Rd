@@ -6,10 +6,10 @@
 \usage{
 estimate_truncatedscore(
   data,
-  ymod,
-  rmod,
-  amod,
-  eventmod,
+  mod.y,
+  mod.r,
+  mod.a,
+  mod.event,
   time,
   cause = 1,
   cens.code = 0,
@@ -20,13 +20,13 @@ estimate_truncatedscore(
 \arguments{
 \item{data}{data.frame}
 
-\item{ymod}{model for clinical outcome given T>time}
+\item{mod.y}{model for clinical outcome given T>time}
 
-\item{rmod}{model for missing data mechanism for clinical outcome at T=time}
+\item{mod.r}{model for missing data mechanism for clinical outcome at T=time}
 
-\item{amod}{treatment model (in RCT should just be 'a ~ 1')}
+\item{mod.a}{treatment model (in RCT should just be 'a ~ 1')}
 
-\item{eventmod}{Model for time-to-event process ('Event(time,status) ~ x')}
+\item{mod.event}{Model for time-to-event process ('Event(time,status) ~ x')}
 
 \item{time}{landmark time}
 
@@ -57,10 +57,10 @@ mod1 <- predictor_glm(y ~ a * (x1 + x2))
 mod2 <- predictor_glm(r ~ a * (x1 + x2), family = binomial)
 a <- estimate_truncatedscore(
   data = dat,
-  ymod = mod1,
-  rmod = mod2,
-  amod = a ~ 1,
-  eventmod = mets::Event(time, status) ~ a * (x1+x2),
+  mod.y = mod1,
+  mod.r = mod2,
+  mod.a = a ~ 1,
+  mod.event = mets::Event(time, status) ~ a * (x1+x2),
   time = 2
 )
 
