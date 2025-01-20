@@ -212,7 +212,7 @@ cate <- function(response.model,
         response.model = response.model,
         treatment_var = treatment_var,
         data = data, folds = folds,
-        stratify = stratify,
+        stratify = stratify
       ),
       ...
     )
