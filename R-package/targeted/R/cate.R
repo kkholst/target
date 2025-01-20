@@ -208,12 +208,11 @@ cate <- function(response.model,
       a = as.list(fargs[, "a"]),
       fold = as.list(fargs[, "fold"]),
       MoreArgs = list(
-        propensity_model = propensity_model,
-        response_model = response_model,
+        propensity.model = propensity.model,
+        response.model = response.model,
         treatment_var = treatment_var,
         data = data, folds = folds,
         stratify = stratify,
-        pb = pb
       ),
       ...
     )
